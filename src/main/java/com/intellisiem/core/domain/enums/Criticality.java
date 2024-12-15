@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.intellisiem.core;
+package com.intellisiem.core.domain.enums;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class IntelliSiemCoreApplicationTests {
-
-    @Test
-    void contextLoads() {
-    }
-
+public enum Criticality {
+    HIGH,   // High criticality
+    MEDIUM, // Medium criticality
+    LOW     // Low criticality
 }

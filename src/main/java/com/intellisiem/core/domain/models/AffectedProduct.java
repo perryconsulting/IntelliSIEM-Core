@@ -21,29 +21,27 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
 /**
- * Represents the source of an asset in the IntelliSIEM system.
- * Sources may include scanning tools like Nmap or Nessus.
+ * Represents a product affected by a vulnerability in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'asset_source' table in the database, and its fields
- * represent columns in the table.</p>
+ * <p>This class is mapped to the 'affected_product' table in the database.</p>
  */
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(schema = "intellisiem", name = "asset_source")
+@Table(schema = "intellisiem", name = "affected_product")
 @ToString(onlyExplicitlyIncluded = true)
-public class AssetSource {
+public class AffectedProduct {
 
     /**
-     * The unique identifier for the asset source.
+     * The unique identifier for the affected product record.
      * This is the primary key and is auto-incremented.
      */
     @Id
@@ -52,21 +50,26 @@ public class AssetSource {
     private Integer id;
 
     /**
-     * The name of the source (e.g., "Nmap"). Cannot be blank and must be unique.
+     * The associated vulnerability to which this product is related.
+     * This field establishes a many-to-one relationship with the {@link Vulnerability} entity.
      */
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Source name cannot be blank.")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vulnerability_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Ensures cascading deletes at the database level
+    @ToString.Exclude
+    private Vulnerability vulnerability;
+
+    /**
+     * The name of the affected product.
+     * Cannot be blank.
+     */
+    @Column(nullable = false, name = "product_name")
+    @NotBlank(message = "Product name cannot be blank.")
     @ToString.Include
-    private String name;
+    private String productName;
 
     /**
-     * A description of the source. Optional.
-     */
-    @Column
-    private String description;
-
-    /**
-     * The timestamp when the source was created.
+     * The timestamp when the record was created.
      * This value is set automatically on creation.
      */
     @Column(nullable = false, name = "created_at", updatable = false)

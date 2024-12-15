@@ -18,6 +18,7 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -27,23 +28,21 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * Represents the source of an asset in the IntelliSIEM system.
- * Sources may include scanning tools like Nmap or Nessus.
+ * Represents a piece of threat intelligence data in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'asset_source' table in the database, and its fields
- * represent columns in the table.</p>
+ * <p>This class is mapped to the 'threat_intelligence' table in the database.</p>
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "intellisiem", name = "asset_source")
+@Table(schema = "intellisiem", name = "threat_intelligence")
 @ToString(onlyExplicitlyIncluded = true)
-public class AssetSource {
+public class ThreatIntelligence {
 
     /**
-     * The unique identifier for the asset source.
+     * The unique identifier for the threat intelligence record.
      * This is the primary key and is auto-incremented.
      */
     @Id
@@ -52,21 +51,52 @@ public class AssetSource {
     private Integer id;
 
     /**
-     * The name of the source (e.g., "Nmap"). Cannot be blank and must be unique.
+     * The type of threat, such as "Malware", "CVE", "IP", or "Domain".
+     * Cannot be blank.
      */
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Source name cannot be blank.")
+    @Column(nullable = false, name = "threat_type", length = 50)
+    @NotBlank(message = "Threat type cannot be blank.")
     @ToString.Include
-    private String name;
+    private String threatType;
 
     /**
-     * A description of the source. Optional.
+     * The specific value of the threat (e.g., a CVE ID, IP address, or domain name).
+     * Cannot be blank.
      */
-    @Column
+    @Column(nullable = false, name = "value", columnDefinition = "TEXT")
+    @NotBlank(message = "Threat value cannot be blank.")
+    @ToString.Include
+    private String value;
+
+    /**
+     * A description of the threat. Optional.
+     */
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     /**
-     * The timestamp when the source was created.
+     * The severity of the threat. Must be one of 'critical', 'high', 'medium', or 'low'.
+     * Cannot be null.
+     */
+    @Column(nullable = false, length = 10)
+    @NotNull(message = "Severity must be specified.")
+    @ToString.Include
+    private String severity;
+
+    /**
+     * The timestamp when the threat was first seen. Optional.
+     */
+    @Column(name = "first_seen")
+    private LocalDateTime firstSeen;
+
+    /**
+     * The timestamp when the threat was last seen. Optional.
+     */
+    @Column(name = "last_seen")
+    private LocalDateTime lastSeen;
+
+    /**
+     * The timestamp when the record was created.
      * This value is set automatically on creation.
      */
     @Column(nullable = false, name = "created_at", updatable = false)

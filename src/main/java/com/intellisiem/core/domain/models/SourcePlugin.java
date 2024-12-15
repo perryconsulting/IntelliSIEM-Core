@@ -27,23 +27,21 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * Represents the source of an asset in the IntelliSIEM system.
- * Sources may include scanning tools like Nmap or Nessus.
+ * Represents a source plugin in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'asset_source' table in the database, and its fields
- * represent columns in the table.</p>
+ * <p>This class is mapped to the 'source_plugin' table in the database.</p>
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "intellisiem", name = "asset_source")
+@Table(schema = "intellisiem", name = "source_plugin")
 @ToString(onlyExplicitlyIncluded = true)
-public class AssetSource {
+public class SourcePlugin {
 
     /**
-     * The unique identifier for the asset source.
+     * The unique identifier for the source plugin.
      * This is the primary key and is auto-incremented.
      */
     @Id
@@ -52,21 +50,29 @@ public class AssetSource {
     private Integer id;
 
     /**
-     * The name of the source (e.g., "Nmap"). Cannot be blank and must be unique.
+     * The name of the plugin. Cannot be blank.
      */
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Source name cannot be blank.")
+    @Column(nullable = false, name = "plugin_name", length = 100)
+    @NotBlank(message = "Plugin name cannot be blank.")
     @ToString.Include
-    private String name;
+    private String pluginName;
 
     /**
-     * A description of the source. Optional.
+     * A flag indicating whether the plugin is enabled.
+     * Defaults to true.
      */
-    @Column
+    @Column(nullable = false, name = "enabled")
+    @ToString.Include
+    private Boolean enabled = true;
+
+    /**
+     * A description of the plugin. Optional.
+     */
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     /**
-     * The timestamp when the source was created.
+     * The timestamp when the record was created.
      * This value is set automatically on creation.
      */
     @Column(nullable = false, name = "created_at", updatable = false)

@@ -18,64 +18,145 @@ package com.intellisiem.core.domain.models;
 
 import com.intellisiem.core.domain.enums.Criticality;
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
-@Data
+/**
+ * Represents an asset in the IntelliSIEM system.
+ * Each asset corresponds to a physical or virtual device within the monitored environment.
+ */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "asset")
+@ToString(onlyExplicitlyIncluded = true) // Avoid the inclusion of lazy-loaded relationships
 public class Asset {
 
+    /**
+     * The unique identifier for the asset.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id; // Primary key using UUID for uniqueness
+    @ToString.Include
+    private UUID id;
 
+    /**
+     * The hostname of the asset. Cannot be blank and must be unique.
+     */
     @Column(nullable = false, unique = true)
-    private String hostname; // Asset hostname (unique within the system)
+    @NotBlank(message = "Hostname cannot be blank.")
+    @ToString.Include
+    private String hostname;
 
-    @Column(nullable = true)
-    private String fqdn; // Fully Qualified Domain Name (optional)
+    /**
+     * The fully qualified domain name (FQDN) of the asset. Optional.
+     */
+    @Column
+    private String fqdn;
 
-    @Column(nullable = true, name = "mac_address")
-    private String macAddress; // MAC address of the asset
+    /**
+     * The MAC address of the asset. Optional.
+     */
+    @Column(name = "mac_address")
+    private String macAddress;
 
+    /**
+     * The type of the asset (e.g., Server, Workstation). Cannot be blank.
+     */
     @Column(nullable = false, name = "asset_type")
-    private String assetType; // Type of the asset (e.g., Server, Workstation)
+    @NotBlank(message = "Asset type cannot be blank.")
+    private String assetType;
 
-    @Column(nullable = true, name = "os_name")
-    private String osName; // Operating system name (optional)
+    /**
+     * The name of the operating system running on the asset. Optional.
+     */
+    @Column(name = "os_name")
+    private String osName;
 
-    @Column(nullable = true, name = "os_version")
-    private String osVersion; // Operating system version (optional)
+    /**
+     * The version of the operating system running on the asset. Optional.
+     */
+    @Column(name = "os_version")
+    private String osVersion;
 
+    /**
+     * The criticality level of the asset (e.g., HIGH, MEDIUM, LOW). Cannot be null.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "criticality")
-    private Criticality criticality; // Criticality level (e.g., HIGH, MEDIUM, LOW)
+    @NotNull(message = "Criticality level must be specified.")
+    private Criticality criticality;
 
+    /**
+     * The source from which the asset was discovered (e.g., Nmap, Nessus). Optional.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
-    private AssetSource source; // Reference to the source of the asset (e.g., Nmap, Nessus)
+    @ToString.Exclude // Prevents lazy loading during toString()
+    private AssetSource source;
 
+    /**
+     * The timestamp when the asset was first created in the system.
+     */
     @Column(nullable = false, name = "created_at", updatable = false)
-    private LocalDateTime createdAt; // Timestamp when the asset was created
+    private LocalDateTime createdAt;
 
+    /**
+     * The timestamp when the asset was last updated in the system.
+     */
     @Column(nullable = false, name = "updated_at")
-    private LocalDateTime updatedAt; // Timestamp when the asset was last updated
+    private LocalDateTime updatedAt;
 
+    /**
+     * Lifecycle hook to set the creation and update timestamps before the entity is persisted.
+     */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * Lifecycle hook to update the timestamp before the entity is updated.
+     */
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Determines equality based on the unique identifier (ID) of the asset.
+     * Transient entities (ID is null) are not considered equal to any other entity.
+     *
+     * @param o the object to compare.
+     * @return true if the objects are equal, false otherwise.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Asset asset)) return false;
+        return id != null && id.equals(asset.id);
+    }
+
+    /**
+     * Generates a hash code based on the unique identifier (ID) of the asset.
+     * If the ID is null (transient entity), a constant hash code is returned.
+     *
+     * @return the hash code.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

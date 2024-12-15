@@ -23,27 +23,27 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
 /**
- * Represents the source of an asset in the IntelliSIEM system.
- * Sources may include scanning tools like Nmap or Nessus.
+ * Represents an IP address associated with an asset in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'asset_source' table in the database, and its fields
- * represent columns in the table.</p>
+ * <p>This class is mapped to the 'ip_address' table in the database.</p>
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "intellisiem", name = "asset_source")
+@Table(schema = "intellisiem", name = "ip_address")
 @ToString(onlyExplicitlyIncluded = true)
-public class AssetSource {
+public class IPAddress {
 
     /**
-     * The unique identifier for the asset source.
+     * The unique identifier for the IP address record.
      * This is the primary key and is auto-incremented.
      */
     @Id
@@ -52,21 +52,26 @@ public class AssetSource {
     private Integer id;
 
     /**
-     * The name of the source (e.g., "Nmap"). Cannot be blank and must be unique.
+     * The associated asset to which this IP address belongs.
+     * This field establishes a many-to-one relationship with the {@link Asset} entity.
      */
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Source name cannot be blank.")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Ensures cascading delete at the database level
+    @ToString.Exclude
+    private Asset asset;
+
+    /**
+     * The IP address string, which can store both IPv4 and IPv6 addresses.
+     * Cannot be blank.
+     */
+    @Column(nullable = false, name = "ip_address", length = 39)
+    @NotBlank(message = "IP cannot be blank.")
     @ToString.Include
-    private String name;
+    private String ip;
 
     /**
-     * A description of the source. Optional.
-     */
-    @Column
-    private String description;
-
-    /**
-     * The timestamp when the source was created.
+     * The timestamp when the IP address record was created.
      * This value is set automatically on creation.
      */
     @Column(nullable = false, name = "created_at", updatable = false)

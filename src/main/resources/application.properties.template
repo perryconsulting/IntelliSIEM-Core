@@ -1,0 +1,19 @@
+spring.application.name=IntelliSIEM-Core
+
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://<server>>:5432/intellisiem
+spring.datasource.username=<username>
+spring.datasource.password=<password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate Settings
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=true
+
+# Flyway Settings
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+
+# Server Port (Optional)
+server.port=8080

@@ -17,9 +17,8 @@
 package com.intellisiem.core.adapters.outbound.repositories;
 
 import com.intellisiem.core.domain.models.AssetThreatMapping;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,10 +26,12 @@ import java.util.UUID;
 
 /**
  * Repository interface for performing CRUD operations on {@link AssetThreatMapping} entities.
- * This interface provides both basic CRUD functionality and custom query methods.
+ *
+ * <p>This interface extends {@link CrudRepository} to provide CRUD operations
+ * and additional query methods for the 'asset_threat_mapping' table in the 'intellisiem' schema.</p>
  */
 @Repository
-public interface AssetThreatMappingRepository extends JpaRepository<AssetThreatMapping, Integer> {
+public interface AssetThreatMappingRepository extends CrudRepository<AssetThreatMapping, Integer> {
 
     /**
      * Retrieves all {@link AssetThreatMapping} entities associated with a specific asset.
@@ -38,7 +39,8 @@ public interface AssetThreatMappingRepository extends JpaRepository<AssetThreatM
      * @param assetId the unique identifier of the associated asset.
      * @return a list of asset-threat mappings linked to the specified asset.
      */
-    List<AssetThreatMapping> findByAsset_Id(UUID assetId);
+    @Query("SELECT * FROM intellisiem.asset_threat_mapping WHERE asset_id = :assetId")
+    List<AssetThreatMapping> findByAssetId(UUID assetId);
 
     /**
      * Retrieves all {@link AssetThreatMapping} entities associated with a specific threat.
@@ -46,7 +48,8 @@ public interface AssetThreatMappingRepository extends JpaRepository<AssetThreatM
      * @param threatId the unique identifier of the associated threat.
      * @return a list of asset-threat mappings linked to the specified threat.
      */
-    List<AssetThreatMapping> findByThreat_Id(Integer threatId);
+    @Query("SELECT * FROM intellisiem.asset_threat_mapping WHERE threat_id = :threatId")
+    List<AssetThreatMapping> findByThreatId(Integer threatId);
 
     /**
      * Retrieves all {@link AssetThreatMapping} entities with a relevance score greater than the specified threshold.
@@ -54,6 +57,6 @@ public interface AssetThreatMappingRepository extends JpaRepository<AssetThreatM
      * @param threshold the relevance score threshold.
      * @return a list of asset-threat mappings with relevance scores exceeding the threshold.
      */
-    @Query("SELECT atm FROM AssetThreatMapping atm WHERE atm.relevanceScore > :threshold")
-    List<AssetThreatMapping> findByRelevanceScoreGreaterThan(@Param("threshold") Double threshold);
+    @Query("SELECT * FROM intellisiem.asset_threat_mapping WHERE relevance_score > :threshold")
+    List<AssetThreatMapping> findByRelevanceScoreGreaterThan(Double threshold);
 }

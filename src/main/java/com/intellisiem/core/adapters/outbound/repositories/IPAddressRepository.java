@@ -17,9 +17,8 @@
 package com.intellisiem.core.adapters.outbound.repositories;
 
 import com.intellisiem.core.domain.models.IPAddress;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,10 +27,12 @@ import java.util.UUID;
 
 /**
  * Repository interface for performing CRUD operations on {@link IPAddress} entities.
- * This interface provides both basic CRUD functionality and custom query methods.
+ *
+ * <p>This interface extends {@link CrudRepository} to provide basic CRUD operations
+ * and additional query methods for the 'ip_address' table in the 'intellisiem' schema.</p>
  */
 @Repository
-public interface IPAddressRepository extends JpaRepository<IPAddress, Integer> {
+public interface IPAddressRepository extends CrudRepository<IPAddress, Integer> {
 
     /**
      * Retrieves all {@link IPAddress} entities associated with a specific asset.
@@ -39,7 +40,8 @@ public interface IPAddressRepository extends JpaRepository<IPAddress, Integer> {
      * @param assetId the unique identifier of the associated asset.
      * @return a list of IP addresses linked to the specified asset.
      */
-    List<IPAddress> findByAsset_Id(UUID assetId);
+    @Query("SELECT * FROM intellisiem.ip_address WHERE asset_id = :assetId")
+    List<IPAddress> findByAssetId(UUID assetId);
 
     /**
      * Finds an {@link IPAddress} by its IP address value.
@@ -47,6 +49,6 @@ public interface IPAddressRepository extends JpaRepository<IPAddress, Integer> {
      * @param ip the IP address to retrieve.
      * @return an {@link Optional} containing the matching IP address, if found.
      */
-    @Query("SELECT ip FROM IPAddress ip WHERE ip.ip = :ip")
-    Optional<IPAddress> findByIp(@Param("ip") String ip);
+    @Query("SELECT * FROM intellisiem.ip_address WHERE ip_address = :ip")
+    Optional<IPAddress> findByIp(String ip);
 }

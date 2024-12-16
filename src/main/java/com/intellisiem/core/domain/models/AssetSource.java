@@ -18,6 +18,8 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -26,13 +28,14 @@ import java.util.Objects;
  * Represents the source of an asset in the IntelliSIEM system.
  * Sources may include scanning tools like Nmap or Nessus.
  *
- * <p>This class is mapped to the 'asset_source' table in the database, and its fields
- * represent columns in the table.</p>
+ * <p>This entity is mapped to the 'asset_source' table in the database.</p>
  */
 
 @Entity
 @Table(schema = "intellisiem", name = "asset_source")
 public class AssetSource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetSource.class);
 
     /**
      * The unique identifier for the asset source.
@@ -66,17 +69,23 @@ public class AssetSource {
      * Default constructor
      */
     public AssetSource() {
+        LOGGER.debug("AssetSource entity initialized with default constructor.");
     }
 
     /**
      * Constructor with parameters
      *
-     * @param name the name of the asset source.
+     * @param name the name of the asset source (must not be blank).
      * @param description the description of the asset source
      */
     public AssetSource(String name, String description) {
+        if (name == null || name.trim().isEmpty()) {
+            LOGGER.error("Asset source name cannot be null or blank when creating AssetSource.");
+            throw new IllegalArgumentException("Asset source name cannot be null or blank when creating AssetSource.");
+        }
         this.name = name;
         this.description = description;
+        LOGGER.debug("AssetSource entity initialized with name '{}' and description '{}'.", name, description);
     }
 
     // Getters and setters
@@ -94,6 +103,10 @@ public class AssetSource {
     }
 
     public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank source name on AssetSource.");
+            throw new IllegalArgumentException("Attempted to set a null or blank source name on AssetSource.");
+        }
         this.name = name;
     }
 
@@ -115,6 +128,7 @@ public class AssetSource {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        LOGGER.debug("AssetSource entity created at {}.", createdAt);
     }
 
     @Override

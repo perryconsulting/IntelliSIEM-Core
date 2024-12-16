@@ -18,6 +18,8 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -31,6 +33,8 @@ import java.util.Objects;
 @Entity
 @Table(schema = "intellisiem", name = "source_plugin")
 public class SourcePlugin {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourcePlugin.class);
 
     /**
      * The unique identifier for the source plugin.
@@ -70,12 +74,27 @@ public class SourcePlugin {
     /**
      * Default constructor.
      */
-    public SourcePlugin() {}
+    public SourcePlugin() {
+        LOGGER.debug("SourcePlugin entity initialized with default constructor.");
+    }
 
+    /**
+     * Constructor with parameters.
+     *
+     * @param pluginName the name of the plugin (must not be blank).
+     * @param enabled whether the plugin is enabled (default: true).
+     * @param description a description of the plugin.
+     */
     public SourcePlugin(String pluginName, Boolean enabled, String description) {
+        if (pluginName == null || pluginName.trim().isEmpty()) {
+            LOGGER.error("Plugin name cannot be null or blank when creating SourcePlugin.");
+            throw new IllegalArgumentException("Plugin name cannot be null or blank when creating SourcePlugin.");
+        }
         this.pluginName = pluginName;
-        this.enabled = enabled;
+        this.enabled = enabled != null ? enabled : true;
         this.description = description;
+
+        LOGGER.debug("SourcePlugin created with name '{}' and enabled '{}'.", pluginName, this.enabled);
     }
 
     // Getters and setters
@@ -93,6 +112,10 @@ public class SourcePlugin {
     }
 
     public void setPluginName(String pluginName) {
+        if (pluginName == null || pluginName.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank plugin name on SourcePlugin.");
+            throw new IllegalArgumentException("Attempted to set a null or blank plugin name on SourcePlugin.");
+        }
         this.pluginName = pluginName;
     }
 
@@ -101,7 +124,7 @@ public class SourcePlugin {
     }
 
     public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+        this.enabled = enabled != null ? enabled : true;
     }
 
     public String getDescription() {
@@ -122,6 +145,7 @@ public class SourcePlugin {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        LOGGER.debug("SourcePlugin entity created at {}.", createdAt);
     }
 
     @Override

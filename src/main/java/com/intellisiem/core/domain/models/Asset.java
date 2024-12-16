@@ -20,6 +20,8 @@ import com.intellisiem.core.domain.enums.Criticality;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -28,10 +30,14 @@ import java.util.UUID;
 /**
  * Represents an asset in the IntelliSIEM system.
  * Each asset corresponds to a physical or virtual device within the monitored environment.
+ *
+ * <p>This entity is mapped to the 'asset' table in the database.</p>
  */
 @Entity
 @Table(schema = "intellisiem", name = "asset")
 public class Asset {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
 
     /**
      * The unique identifier for the asset.
@@ -108,21 +114,37 @@ public class Asset {
     /**
      * Default constructor
      */
-    public Asset() {}
+    public Asset() {
+        LOGGER.debug("Asset entity initialized with default constructor.");
+    }
 
     /**
      * Constructor with parameters.
      *
-     * @param hostname the hostname of the asset.
+     * @param hostname the hostname of the asset (must not be blank).
      * @param fqdn the fully qualified domain name of the asset.
      * @param macAddress the MAC address of the asset.
-     * @param assetType the type of the asset (e.g., Server).
-     * @param osName the name of the operating system.
-     * @param osVersion the version of the operating system.
-     * @param criticality the criticality level of the asset.
+     * @param assetType the type of the asset (must not be blank).
+     * @param osName the operating system name.
+     * @param osVersion the operating system version.
+     * @param criticality the criticality of the asset (must not be null).
      * @param source the source of the asset information.
      */
-    public Asset(String hostname, String fqdn, String macAddress, String assetType, String osName, String osVersion, Criticality criticality, AssetSource source) {
+    public Asset(String hostname, String fqdn, String macAddress, String assetType,
+                 String osName, String osVersion, Criticality criticality, AssetSource source) {
+        if (hostname == null || hostname.trim().isEmpty()) {
+            LOGGER.error("Hostname cannot be blank when creating Asset.");
+            throw new IllegalArgumentException("Hostname cannot be blank when creating Asset.");
+        }
+        if (assetType == null || assetType.trim().isEmpty()) {
+            LOGGER.error("Asset type cannot be blank when creating Asset.");
+            throw new IllegalArgumentException("Asset type cannot be blank when creating Asset.");
+        }
+        if (criticality == null) {
+            LOGGER.error("Criticality must be specified when creating Asset.");
+            throw new IllegalArgumentException("Criticality must not be null when creating Asset.");
+        }
+
         this.hostname = hostname;
         this.fqdn = fqdn;
         this.macAddress = macAddress;
@@ -131,6 +153,8 @@ public class Asset {
         this.osVersion = osVersion;
         this.criticality = criticality;
         this.source = source;
+
+        LOGGER.debug("Asset created with hostname '{}' and criticality '{}'.", hostname, criticality);
     }
 
     // Getters and setters
@@ -144,6 +168,10 @@ public class Asset {
         return hostname;
     }
     public void setHostname(String hostname) {
+        if (hostname == null || hostname.trim().isEmpty()) {
+            LOGGER.error("Attempted to set null or blank hostname to Asset entity.");
+            throw new IllegalArgumentException("Attempted to set null or blank hostname to Asset entity.");
+        }
         this.hostname = hostname;
     }
 
@@ -168,6 +196,10 @@ public class Asset {
     }
 
     public void setAssetType(String assetType) {
+        if (assetType == null || assetType.trim().isEmpty()) {
+            LOGGER.error("Attempted to set null or blank asset type to Asset entity.");
+            throw new IllegalArgumentException("Attempted to set null or blank asset type to Asset entity.");
+        }
         this.assetType = assetType;
     }
 
@@ -192,6 +224,10 @@ public class Asset {
     }
 
     public void setCriticality(Criticality criticality) {
+        if (criticality == null) {
+            LOGGER.error("Attempted to set null criticality to Asset entity.");
+            throw new IllegalArgumentException("Attempted to set null criticality to Asset entity.");
+        }
         this.criticality = criticality;
     }
 
@@ -218,6 +254,17 @@ public class Asset {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        LOGGER.debug("Asset entity initialized with hostname '{}' and criticality '{}'.", hostname, criticality);
+        if (source != null) {
+            LOGGER.debug("Asset entity initialized with source '{}'.", source.getName());
+        } else {
+            LOGGER.debug("Asset entity initialized with no source.");
+        }
+        if (fqdn != null && !fqdn.trim().isEmpty()) {
+            LOGGER.debug("Asset entity initialized with FQDN '{}'.", fqdn);
+        } else {
+            LOGGER.debug("Asset entity initialized with no FQDN.");
+        }
     }
 
     /**
@@ -226,15 +273,19 @@ public class Asset {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+        LOGGER.debug("Asset entity updated with hostname '{}' and criticality '{}'.", hostname, criticality);
+        if (source != null) {
+            LOGGER.debug("Asset entity updated with source '{}'.", source.getName());
+        } else {
+            LOGGER.debug("Asset entity updated with no source.");
+        }
+        if (fqdn != null && !fqdn.trim().isEmpty()) {
+            LOGGER.debug("Asset entity updated with FQDN '{}'.", fqdn);
+        } else {
+            LOGGER.debug("Asset entity updated with no FQDN.");
+        }
     }
 
-    /**
-     * Determines equality based on the unique identifier (ID) of the asset.
-     * Transient entities (ID is null) are not considered equal to any other entity.
-     *
-     * @param o the object to compare.
-     * @return true if the objects are equal, false otherwise.
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -242,12 +293,6 @@ public class Asset {
         return Objects.equals(id, asset.id);
     }
 
-    /**
-     * Generates a hash code based on the unique identifier (ID) of the asset.
-     * If the ID is null (transient entity), a constant hash code is returned.
-     *
-     * @return the hash code.
-     */
     @Override
     public int hashCode() {
         return Objects.hashCode(id);

@@ -18,6 +18,8 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,13 +27,14 @@ import java.util.Objects;
 /**
  * Represents a mapping between an asset and a threat in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'asset_threat_mapping' table in the database.</p>
- *
- * <p>The mapping includes a calculated relevance score for prioritization.</p>
+ * <p>This class is mapped to the 'asset_threat_mapping' table in the database and
+ * includes a calculated relevance score for prioritization.</p>
  */
 @Entity
 @Table(schema = "intellisiem", name = "asset_threat_mapping")
 public class AssetThreatMapping {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(AssetThreatMapping.class);
 
     /**
      * The unique identifier for the asset-threat mapping record.
@@ -47,6 +50,7 @@ public class AssetThreatMapping {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
+    @NotNull(message = "Asset cannot be null.")
     private Asset asset;
 
     /**
@@ -55,6 +59,7 @@ public class AssetThreatMapping {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "threat_id", referencedColumnName = "id", nullable = false)
+    @NotNull(message = "Threat cannot be null.")
     private ThreatIntelligence threat;
 
     /**
@@ -75,12 +80,37 @@ public class AssetThreatMapping {
     /**
      * Default constructor.
      */
-    public AssetThreatMapping() {}
+    public AssetThreatMapping() {
+        LOGGER.debug("AssetThreatMapping entity initialized with default constructor.");
+    }
 
+    /**
+     * Constructor with parameters.
+     *
+     * @param asset the associated asset (must not be null).
+     * @param threat the associated threat (must not be null).
+     * @param relevanceScore the relevance score of the mapping (must not be null).
+     */
     public AssetThreatMapping(Asset asset, ThreatIntelligence threat, Double relevanceScore) {
+        if (asset == null) {
+            LOGGER.error("Asset cannot be null when creating AssetThreatMapping.");
+            throw new IllegalArgumentException("Asset cannot be null.");
+        }
+        if (threat == null) {
+            LOGGER.error("Threat cannot be null when creating AssetThreatMapping.");
+            throw new IllegalArgumentException("Threat cannot be null.");
+        }
+        if (relevanceScore == null) {
+            LOGGER.error("Relevance score cannot be null when creating AssetThreatMapping.");
+            throw new IllegalArgumentException("Relevance score cannot be null.");
+        }
+
         this.asset = asset;
         this.threat = threat;
         this.relevanceScore = relevanceScore;
+
+        LOGGER.debug("AssetThreatMapping created with asset ID {}, threat ID {}, and relevance score {}.",
+                asset.getId(), threat.getId(), relevanceScore);
     }
 
     // Getters and setters
@@ -98,6 +128,10 @@ public class AssetThreatMapping {
     }
 
     public void setAsset(Asset asset) {
+        if (asset == null) {
+            LOGGER.error("Attempted to set a null asset on AssetThreatMapping.");
+            throw new IllegalArgumentException("Attempted to set a null asset on AssetThreatMapping.");
+        }
         this.asset = asset;
     }
 
@@ -106,6 +140,10 @@ public class AssetThreatMapping {
     }
 
     public void setThreat(ThreatIntelligence threat) {
+        if (threat == null) {
+            LOGGER.error("Attempted to set a null threat on AssetThreatMapping.");
+            throw new IllegalArgumentException("Attempted to set a null threat on AssetThreatMapping.");
+        }
         this.threat = threat;
     }
 
@@ -114,6 +152,10 @@ public class AssetThreatMapping {
     }
 
     public void setRelevanceScore(Double relevanceScore) {
+        if (relevanceScore == null) {
+            LOGGER.error("Attempted to set a null relevance score on AssetThreatMapping.");
+            throw new IllegalArgumentException("Attempted to set a null relevance score on AssetThreatMapping.");
+        }
         this.relevanceScore = relevanceScore;
     }
 
@@ -127,6 +169,7 @@ public class AssetThreatMapping {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        LOGGER.debug("AssetThreatMapping created with ID {} at {}.", this.id, this.createdAt);
     }
 
     @Override

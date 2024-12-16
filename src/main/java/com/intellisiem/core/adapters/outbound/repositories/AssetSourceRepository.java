@@ -17,17 +17,20 @@
 package com.intellisiem.core.adapters.outbound.repositories;
 
 import com.intellisiem.core.domain.models.AssetSource;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
  * Repository interface for performing CRUD operations on {@link AssetSource} entities.
- * This interface provides both basic CRUD functionality and custom query methods.
+ *
+ * <p>This interface extends {@link CrudRepository} to provide basic CRUD operations
+ * and additional query methods for the 'asset_source' table in the 'intellisiem' schema.</p>
  */
 @Repository
-public interface AssetSourceRepository extends JpaRepository<AssetSource, Integer> {
+public interface AssetSourceRepository extends CrudRepository<AssetSource, Integer> {
 
     /**
      * Finds an {@link AssetSource} by its name.
@@ -35,5 +38,6 @@ public interface AssetSourceRepository extends JpaRepository<AssetSource, Intege
      * @param name the name of the asset source to retrieve.
      * @return an {@link Optional} containing the matching asset source, if found.
      */
+    @Query("SELECT * FROM intellisiem.asset_source WHERE name = :name")
     Optional<AssetSource> findByName(String name);
 }

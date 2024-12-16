@@ -18,9 +18,8 @@ package com.intellisiem.core.adapters.outbound.repositories;
 
 import com.intellisiem.core.domain.enums.Criticality;
 import com.intellisiem.core.domain.models.Asset;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,10 +28,12 @@ import java.util.UUID;
 
 /**
  * Repository interface for performing CRUD operations on {@link Asset} entities.
- * This interface provides both basic CRUD functionality and custom query methods.
+ *
+ * <p>This interface extends {@link CrudRepository} to provide basic CRUD operations
+ * and additional query methods for the 'asset' table in the 'intellisiem' schema.</p>
  */
 @Repository
-public interface AssetRepository extends JpaRepository<Asset, UUID> {
+public interface AssetRepository extends CrudRepository<Asset, UUID> {
 
     /**
      * Finds an {@link Asset} by its hostname.
@@ -40,6 +41,7 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
      * @param hostname the hostname of the asset to retrieve.
      * @return an {@link Optional} containing the matching asset, if found.
      */
+    @Query("SELECT * FROM intellisiem.asset WHERE hostname = :hostname")
     Optional<Asset> findByHostname(String hostname);
 
     /**
@@ -48,6 +50,7 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
      * @param assetType the type of the asset (e.g., "Server", "Workstation").
      * @return a list of assets matching the given type.
      */
+    @Query("SELECT * FROM intellisiem.asset WHERE asset_type = :assetType")
     List<Asset> findByAssetType(String assetType);
 
     /**
@@ -56,8 +59,8 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
      * @param criticality the criticality level (e.g., HIGH, MEDIUM, LOW).
      * @return a list of assets matching the specified criticality.
      */
-    @Query("SELECT a FROM Asset a WHERE a.criticality = :criticality")
-    List<Asset> findByCriticality(@Param("criticality") Criticality criticality);
+    @Query("SELECT * FROM intellisiem.asset WHERE criticality = :criticality")
+    List<Asset> findByCriticality(Criticality criticality);
 
     /**
      * Checks whether an {@link Asset} exists with the given hostname.
@@ -65,5 +68,6 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
      * @param hostname the hostname to check.
      * @return true if an asset with the given hostname exists, false otherwise.
      */
+    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM intellisiem.asset WHERE hostname = :hostname")
     boolean existsByHostname(String hostname);
 }

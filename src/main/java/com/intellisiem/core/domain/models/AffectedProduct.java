@@ -18,6 +18,9 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,11 +28,13 @@ import java.util.Objects;
 /**
  * Represents a product affected by a vulnerability in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'affected_product' table in the database.</p>
+ * <p>This entity is mapped to the 'affected_product' table in the database.</p>
  */
 @Entity
 @Table(schema = "intellisiem", name = "affected_product")
 public class AffectedProduct {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AffectedProduct.class);
 
     /**
      * The unique identifier for the affected product record.
@@ -42,9 +47,11 @@ public class AffectedProduct {
     /**
      * The associated vulnerability to which this product is related.
      * This field establishes a many-to-one relationship with the {@link Vulnerability} entity.
+     * Cannot be null.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vulnerability_id", referencedColumnName = "id", nullable = false)
+    @NotNull(message = "Vulnerability must not be null.")
     private Vulnerability vulnerability;
 
     /**
@@ -65,17 +72,28 @@ public class AffectedProduct {
     /**
      * Default constructor
      */
-    public AffectedProduct() {}
+    public AffectedProduct() {
+        LOGGER.debug("AffectedProduct entity initialized with default constructor.");
+    }
 
     /**
      * Constructor with parameters
      *
-     * @param vulnerability the associated vulnerability
-     * @param productName the name of the affected product
+     * @param vulnerability the associated vulnerability (must not be null).
+     * @param productName the name of the affected product (must not be blank).
      */
     public AffectedProduct(Vulnerability vulnerability, String productName) {
+        if (vulnerability == null) {
+            LOGGER.error("Vulnerability cannot be null when creating AffectedProduct.");
+            throw new IllegalArgumentException("Vulnerability cannot be null when creating AffectedProduct.");
+        }
+        if (productName == null || productName.trim().isEmpty()) {
+            LOGGER.error("Product name cannot be null or blank when creating AffectedProduct.");
+            throw new IllegalArgumentException("Product name cannot be null or blank when creating AffectedProduct.");
+        }
         this.vulnerability = vulnerability;
         this.productName = productName;
+        LOGGER.debug("AffectedProduct entity initialized with vulnerability ID {} and product name '{}'.", vulnerability.getId(), productName);
     }
 
     // Getters and setters
@@ -93,6 +111,10 @@ public class AffectedProduct {
     }
 
     public void setVulnerability(Vulnerability vulnerability) {
+        if (vulnerability == null) {
+            LOGGER.error("Attempted to set a null vulnerability on AffectedProduct.");
+            throw new IllegalArgumentException("Attempted to set a null vulnerability on AffectedProduct.");
+        }
         this.vulnerability = vulnerability;
     }
 
@@ -101,6 +123,10 @@ public class AffectedProduct {
     }
 
     public void setProductName(String productName) {
+        if (productName == null || productName.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank product name on AffectedProduct.");
+            throw new IllegalArgumentException("Attempted to set a null or blank product name on AffectedProduct.");
+        }
         this.productName = productName;
     }
 
@@ -109,11 +135,12 @@ public class AffectedProduct {
     }
 
     /**
-     * Lifecycle hook to set the creation timestamp before the entity is persisted.
+     * Lifecycle hook to set the created timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        LOGGER.debug("AffectedProduct entity persisted with creation timestamp {}.", createdAt);
     }
 
     @Override

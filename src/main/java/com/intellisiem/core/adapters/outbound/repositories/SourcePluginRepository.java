@@ -17,9 +17,8 @@
 package com.intellisiem.core.adapters.outbound.repositories;
 
 import com.intellisiem.core.domain.models.SourcePlugin;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,16 +26,19 @@ import java.util.Optional;
 
 /**
  * Repository interface for performing CRUD operations on {@link SourcePlugin} entities.
- * This interface provides both basic CRUD functionality and custom query methods.
+ *
+ * <p>This interface extends {@link CrudRepository} to provide basic CRUD operations
+ * and additional query methods for the 'source_plugin' table in the 'intellisiem' schema.</p>
  */
 @Repository
-public interface SourcePluginRepository extends JpaRepository<SourcePlugin, Integer> {
+public interface SourcePluginRepository extends CrudRepository<SourcePlugin, Integer> {
 
     /**
      * Retrieves all enabled {@link SourcePlugin} entities.
      *
      * @return a list of source plugins where the "enabled" flag is true.
      */
+    @Query("SELECT * FROM intellisiem.source_plugin WHERE enabled = TRUE")
     List<SourcePlugin> findByEnabledTrue();
 
     /**
@@ -45,6 +47,6 @@ public interface SourcePluginRepository extends JpaRepository<SourcePlugin, Inte
      * @param pluginName the name of the plugin to search for.
      * @return an {@link Optional} containing the matching source plugin, if found.
      */
-    @Query("SELECT sp FROM SourcePlugin sp WHERE sp.pluginName = :pluginName")
-    Optional<SourcePlugin> findByPluginName(@Param("pluginName") String pluginName);
+    @Query("SELECT * FROM intellisiem.source_plugin WHERE plugin_name = :pluginName")
+    Optional<SourcePlugin> findByPluginName(String pluginName);
 }

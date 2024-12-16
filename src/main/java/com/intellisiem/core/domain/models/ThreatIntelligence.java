@@ -19,6 +19,8 @@ package com.intellisiem.core.domain.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -26,11 +28,13 @@ import java.util.Objects;
 /**
  * Represents a piece of threat intelligence data in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'threat_intelligence' table in the database.</p>
+ * <p>This entity is mapped to the 'threat_intelligence' table in the database.</p>
  */
 @Entity
 @Table(schema = "intellisiem", name = "threat_intelligence")
 public class ThreatIntelligence {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreatIntelligence.class);
 
     /**
      * The unique identifier for the threat intelligence record.
@@ -92,26 +96,52 @@ public class ThreatIntelligence {
     /**
      * Default constructor.
      */
-    public ThreatIntelligence() {}
+    public ThreatIntelligence() {
+        LOGGER.debug("ThreatIntelligence entity initialized with default constructor.");
+    }
 
     /**
      * Constructor with parameters.
      *
-     * @param threatType the type of threat.
-     * @param value the value of the threat.
+     * @param threatType the type of threat (must not be blank).
+     * @param value the value of the threat (must not be blank).
      * @param description a description of the threat.
-     * @param severity the severity of the threat.
+     * @param severity the severity of the threat (must not be null).
      * @param firstSeen the first seen timestamp of the threat.
      * @param lastSeen the last seen timestamp of the threat.
      */
     public ThreatIntelligence(String threatType, String value, String description,
                               String severity, LocalDateTime firstSeen, LocalDateTime lastSeen) {
+        if (threatType == null || threatType.trim().isEmpty()) {
+            LOGGER.error("Threat type cannot be null or blank when creating ThreatIntelligence.");
+            throw new IllegalArgumentException("Threat type cannot be null or blank when creating ThreatIntelligence.");
+        }
+        if (value == null || value.trim().isEmpty()) {
+            LOGGER.error("Threat value cannot be null or blank when creating ThreatIntelligence.");
+            throw new IllegalArgumentException("Threat value cannot be null or blank when creating ThreatIntelligence.");
+        }
+        if (severity == null || severity.trim().isEmpty()) {
+            LOGGER.error("Threat severity cannot be null or blank when creating ThreatIntelligence.");
+            throw new IllegalArgumentException("Threat severity cannot be null or blank when creating ThreatIntelligence.");
+        }
+
         this.threatType = threatType;
         this.value = value;
         this.description = description;
         this.severity = severity;
         this.firstSeen = firstSeen;
         this.lastSeen = lastSeen;
+
+        LOGGER.debug("ThreatIntelligence created with type '{}' and value '{}'.", threatType, value);
+        if (firstSeen != null) {
+            LOGGER.debug("ThreatIntelligence created with first seen timestamp '{}'.", firstSeen);
+        }
+        if (lastSeen != null) {
+            LOGGER.debug("ThreatIntelligence created with last seen timestamp '{}'.", lastSeen);
+        }
+        if (description != null) {
+            LOGGER.debug("ThreatIntelligence created with description '{}'.", description);
+        }
     }
 
     // Getters and setters
@@ -129,6 +159,10 @@ public class ThreatIntelligence {
     }
 
     public void setThreatType(String threatType) {
+        if (threatType == null || threatType.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank threat type on ThreatIntelligence.");
+            throw new IllegalArgumentException("Attempted to set a null or blank threat type on ThreatIntelligence.");
+        }
         this.threatType = threatType;
     }
 
@@ -137,6 +171,10 @@ public class ThreatIntelligence {
     }
 
     public void setValue(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank threat value on ThreatIntelligence.");
+            throw new IllegalArgumentException("Attempted to set a null or blank threat value on ThreatIntelligence.");
+        }
         this.value = value;
     }
 
@@ -153,6 +191,10 @@ public class ThreatIntelligence {
     }
 
     public void setSeverity(String severity) {
+        if (severity == null || severity.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank threat severity on ThreatIntelligence.");
+            throw new IllegalArgumentException("Attempted to set a null or blank threat severity on ThreatIntelligence.");
+        }
         this.severity = severity;
     }
 
@@ -182,6 +224,7 @@ public class ThreatIntelligence {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        LOGGER.debug("ThreatIntelligence created with timestamp '{}'.", createdAt);
     }
 
     @Override

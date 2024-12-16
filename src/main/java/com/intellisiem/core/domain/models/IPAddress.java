@@ -18,6 +18,9 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,11 +28,13 @@ import java.util.Objects;
 /**
  * Represents an IP address associated with an asset in the IntelliSIEM system.
  *
- * <p>This class is mapped to the 'ip_address' table in the database.</p>
+ * <p>This entity is mapped to the 'ip_address' table in the database.</p>
  */
 @Entity
 @Table(schema = "intellisiem", name = "ip_address")
 public class IPAddress {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IPAddress.class);
 
     /**
      * The unique identifier for the IP address record.
@@ -42,9 +47,11 @@ public class IPAddress {
     /**
      * The associated asset to which this IP address belongs.
      * This field establishes a many-to-one relationship with the {@link Asset} entity.
+     * Cannot be null.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
+    @NotNull(message = "Asset cannot be null.")
     private Asset asset;
 
     /**
@@ -65,17 +72,29 @@ public class IPAddress {
     /**
      * Default constructor.
      */
-    public IPAddress() {}
+    public IPAddress() {
+        LOGGER.debug("IPAddress entity initialized with default constructor.");
+    }
 
     /**
      * Constructor with parameters.
      *
-     * @param asset the associated asset.
-     * @param ip the IP address string.
+     * @param asset the associated asset (must not be null).
+     * @param ip the IP address string (must not be blank).
      */
     public IPAddress(Asset asset, String ip) {
+        if (asset == null) {
+            LOGGER.error("Asset cannot be null when creating IPAddress.");
+            throw new IllegalArgumentException("Asset cannot be null when creating IPAddress.");
+        }
+        if (ip == null || ip.trim().isEmpty()) {
+            LOGGER.error("IP cannot be null or blank when creating IPAddress.");
+            throw new IllegalArgumentException("IP cannot be null or blank when creating IPAddress.");
+        }
         this.asset = asset;
         this.ip = ip;
+
+        LOGGER.debug("IPAddress created with asset ID {} and IP address '{}'.", asset.getId(), ip);
     }
 
     // Getters and setters
@@ -93,6 +112,10 @@ public class IPAddress {
     }
 
     public void setAsset(Asset asset) {
+        if (asset == null) {
+            LOGGER.error("Attempted to set a null asset on IPAddress.");
+            throw new IllegalArgumentException("Attempted to set a null asset on IPAddress.");
+        }
         this.asset = asset;
     }
 
@@ -101,6 +124,10 @@ public class IPAddress {
     }
 
     public void setIp(String ip) {
+        if (ip == null || ip.trim().isEmpty()) {
+            LOGGER.error("Attempted to set a null or blank IP address on IPAddress.");
+            throw new IllegalArgumentException("Attempted to set a null or blank IP address on IPAddress.");
+        }
         this.ip = ip;
     }
 
@@ -114,6 +141,7 @@ public class IPAddress {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        LOGGER.debug("IPAddress persisted with creation timestamp {}.", createdAt);
     }
 
     @Override

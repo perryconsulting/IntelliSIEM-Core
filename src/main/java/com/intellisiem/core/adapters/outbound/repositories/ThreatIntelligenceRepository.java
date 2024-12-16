@@ -17,19 +17,20 @@
 package com.intellisiem.core.adapters.outbound.repositories;
 
 import com.intellisiem.core.domain.models.ThreatIntelligence;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Repository interface for performing CRUD operations on {@link ThreatIntelligence} entities.
- * This interface provides both basic CRUD functionality and custom query methods.
+ *
+ * <p>This interface extends {@link CrudRepository} to provide basic CRUD operations
+ * and additional query methods for the 'threat_intelligence' table in the 'intellisiem' schema.</p>
  */
 @Repository
-public interface ThreatIntelligenceRepository extends JpaRepository<ThreatIntelligence, Integer> {
+public interface ThreatIntelligenceRepository extends CrudRepository<ThreatIntelligence, Integer> {
 
     /**
      * Retrieves all {@link ThreatIntelligence} entities with the specified severity level.
@@ -37,6 +38,7 @@ public interface ThreatIntelligenceRepository extends JpaRepository<ThreatIntell
      * @param severity the severity level (e.g., "critical", "high", "medium", "low").
      * @return a list of threat intelligence records matching the specified severity.
      */
+    @Query("SELECT * FROM intellisiem.threat_intelligence WHERE severity = :severity")
     List<ThreatIntelligence> findBySeverity(String severity);
 
     /**
@@ -45,6 +47,7 @@ public interface ThreatIntelligenceRepository extends JpaRepository<ThreatIntell
      * @param threatType the type of threat (e.g., "Malware", "CVE", "IP", "Domain").
      * @return a list of threat intelligence records matching the specified type.
      */
+    @Query("SELECT * FROM intellisiem.threat_intelligence WHERE threat_type = :threatType")
     List<ThreatIntelligence> findByThreatType(String threatType);
 
     /**
@@ -53,6 +56,6 @@ public interface ThreatIntelligenceRepository extends JpaRepository<ThreatIntell
      * @param value the search pattern (e.g., partial match for threat values).
      * @return a list of threat intelligence records whose values match the pattern.
      */
-    @Query("SELECT ti FROM ThreatIntelligence ti WHERE ti.value LIKE %:value%")
-    List<ThreatIntelligence> searchByValue(@Param("value") String value);
+    @Query("SELECT * FROM intellisiem.threat_intelligence WHERE value LIKE %:value%")
+    List<ThreatIntelligence> searchByValue(String value);
 }

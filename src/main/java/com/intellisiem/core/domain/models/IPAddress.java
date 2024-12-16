@@ -18,28 +18,17 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents an IP address associated with an asset in the IntelliSIEM system.
  *
  * <p>This class is mapped to the 'ip_address' table in the database.</p>
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "ip_address")
-@ToString(onlyExplicitlyIncluded = true)
 public class IPAddress {
 
     /**
@@ -48,7 +37,6 @@ public class IPAddress {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Integer id;
 
     /**
@@ -57,8 +45,6 @@ public class IPAddress {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // Ensures cascading delete at the database level
-    @ToString.Exclude
     private Asset asset;
 
     /**
@@ -67,7 +53,6 @@ public class IPAddress {
      */
     @Column(nullable = false, name = "ip_address", length = 39)
     @NotBlank(message = "IP cannot be blank.")
-    @ToString.Include
     private String ip;
 
     /**
@@ -78,10 +63,77 @@ public class IPAddress {
     private LocalDateTime createdAt;
 
     /**
+     * Default constructor.
+     */
+    public IPAddress() {}
+
+    /**
+     * Constructor with parameters.
+     *
+     * @param asset the associated asset.
+     * @param ip the IP address string.
+     */
+    public IPAddress(Asset asset, String ip) {
+        this.asset = asset;
+        this.ip = ip;
+    }
+
+    // Getters and setters
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Asset getAsset() {
+        return asset;
+    }
+
+    public void setAsset(Asset asset) {
+        this.asset = asset;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * Lifecycle hook to set the creation timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof IPAddress that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "IPAddress{" +
+                "id=" + id +
+                ", ip='" + ip + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

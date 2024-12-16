@@ -19,26 +19,17 @@ package com.intellisiem.core.domain.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents a piece of threat intelligence data in the IntelliSIEM system.
  *
  * <p>This class is mapped to the 'threat_intelligence' table in the database.</p>
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "threat_intelligence")
-@ToString(onlyExplicitlyIncluded = true)
 public class ThreatIntelligence {
 
     /**
@@ -47,7 +38,6 @@ public class ThreatIntelligence {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Integer id;
 
     /**
@@ -56,7 +46,6 @@ public class ThreatIntelligence {
      */
     @Column(nullable = false, name = "threat_type", length = 50)
     @NotBlank(message = "Threat type cannot be blank.")
-    @ToString.Include
     private String threatType;
 
     /**
@@ -65,7 +54,6 @@ public class ThreatIntelligence {
      */
     @Column(nullable = false, name = "value", columnDefinition = "TEXT")
     @NotBlank(message = "Threat value cannot be blank.")
-    @ToString.Include
     private String value;
 
     /**
@@ -80,7 +68,6 @@ public class ThreatIntelligence {
      */
     @Column(nullable = false, length = 10)
     @NotNull(message = "Severity must be specified.")
-    @ToString.Include
     private String severity;
 
     /**
@@ -103,10 +90,120 @@ public class ThreatIntelligence {
     private LocalDateTime createdAt;
 
     /**
+     * Default constructor.
+     */
+    public ThreatIntelligence() {}
+
+    /**
+     * Constructor with parameters.
+     *
+     * @param threatType the type of threat.
+     * @param value the value of the threat.
+     * @param description a description of the threat.
+     * @param severity the severity of the threat.
+     * @param firstSeen the first seen timestamp of the threat.
+     * @param lastSeen the last seen timestamp of the threat.
+     */
+    public ThreatIntelligence(String threatType, String value, String description,
+                              String severity, LocalDateTime firstSeen, LocalDateTime lastSeen) {
+        this.threatType = threatType;
+        this.value = value;
+        this.description = description;
+        this.severity = severity;
+        this.firstSeen = firstSeen;
+        this.lastSeen = lastSeen;
+    }
+
+    // Getters and setters
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getThreatType() {
+        return threatType;
+    }
+
+    public void setThreatType(String threatType) {
+        this.threatType = threatType;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public LocalDateTime getFirstSeen() {
+        return firstSeen;
+    }
+
+    public void setFirstSeen(LocalDateTime firstSeen) {
+        this.firstSeen = firstSeen;
+    }
+
+    public LocalDateTime getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(LocalDateTime lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * Lifecycle hook to set the creation timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ThreatIntelligence that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "ThreatIntelligence{" +
+                "id=" + id +
+                ", threatType='" + threatType + '\'' +
+                ", value='" + value + '\'' +
+                ", severity='" + severity + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

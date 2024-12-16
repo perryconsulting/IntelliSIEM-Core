@@ -18,26 +18,17 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents a product affected by a vulnerability in the IntelliSIEM system.
  *
  * <p>This class is mapped to the 'affected_product' table in the database.</p>
  */
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "affected_product")
-@ToString(onlyExplicitlyIncluded = true)
 public class AffectedProduct {
 
     /**
@@ -46,7 +37,6 @@ public class AffectedProduct {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Integer id;
 
     /**
@@ -55,8 +45,6 @@ public class AffectedProduct {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vulnerability_id", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // Ensures cascading deletes at the database level
-    @ToString.Exclude
     private Vulnerability vulnerability;
 
     /**
@@ -65,7 +53,6 @@ public class AffectedProduct {
      */
     @Column(nullable = false, name = "product_name")
     @NotBlank(message = "Product name cannot be blank.")
-    @ToString.Include
     private String productName;
 
     /**
@@ -76,10 +63,77 @@ public class AffectedProduct {
     private LocalDateTime createdAt;
 
     /**
+     * Default constructor
+     */
+    public AffectedProduct() {}
+
+    /**
+     * Constructor with parameters
+     *
+     * @param vulnerability the associated vulnerability
+     * @param productName the name of the affected product
+     */
+    public AffectedProduct(Vulnerability vulnerability, String productName) {
+        this.vulnerability = vulnerability;
+        this.productName = productName;
+    }
+
+    // Getters and setters
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Vulnerability getVulnerability() {
+        return vulnerability;
+    }
+
+    public void setVulnerability(Vulnerability vulnerability) {
+        this.vulnerability = vulnerability;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * Lifecycle hook to set the creation timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AffectedProduct that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "AffectedProduct{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

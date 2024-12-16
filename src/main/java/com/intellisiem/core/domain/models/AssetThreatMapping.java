@@ -18,28 +18,19 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents a mapping between an asset and a threat in the IntelliSIEM system.
  *
  * <p>This class is mapped to the 'asset_threat_mapping' table in the database.</p>
+ *
+ * <p>The mapping includes a calculated relevance score for prioritization.</p>
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "asset_threat_mapping")
-@ToString(onlyExplicitlyIncluded = true)
 public class AssetThreatMapping {
 
     /**
@@ -48,7 +39,6 @@ public class AssetThreatMapping {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Integer id;
 
     /**
@@ -57,8 +47,6 @@ public class AssetThreatMapping {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // Ensures cascading deletes at the database level
-    @ToString.Exclude
     private Asset asset;
 
     /**
@@ -67,8 +55,6 @@ public class AssetThreatMapping {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "threat_id", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // Ensures cascading deletes at the database level
-    @ToString.Exclude
     private ThreatIntelligence threat;
 
     /**
@@ -77,8 +63,7 @@ public class AssetThreatMapping {
      */
     @Column(nullable = false, name = "relevance_score", precision = 5, scale = 2)
     @NotNull(message = "Relevance score cannot be null.")
-    @ToString.Include
-    private Double relevanceScore = 0.0;
+    private Double relevanceScore;
 
     /**
      * The timestamp when the record was created.
@@ -88,10 +73,80 @@ public class AssetThreatMapping {
     private LocalDateTime createdAt;
 
     /**
+     * Default constructor.
+     */
+    public AssetThreatMapping() {}
+
+    public AssetThreatMapping(Asset asset, ThreatIntelligence threat, Double relevanceScore) {
+        this.asset = asset;
+        this.threat = threat;
+        this.relevanceScore = relevanceScore;
+    }
+
+    // Getters and setters
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Asset getAsset() {
+        return asset;
+    }
+
+    public void setAsset(Asset asset) {
+        this.asset = asset;
+    }
+
+    public ThreatIntelligence getThreat() {
+        return threat;
+    }
+
+    public void setThreat(ThreatIntelligence threat) {
+        this.threat = threat;
+    }
+
+    public Double getRelevanceScore() {
+        return relevanceScore;
+    }
+
+    public void setRelevanceScore(Double relevanceScore) {
+        this.relevanceScore = relevanceScore;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * Lifecycle hook to set the creation timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AssetThreatMapping that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "AssetThreatMapping{" +
+                "id=" + id +
+                ", relevanceScore=" + relevanceScore +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

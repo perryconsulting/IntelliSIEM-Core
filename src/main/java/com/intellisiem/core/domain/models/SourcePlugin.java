@@ -18,26 +18,18 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents a source plugin in the IntelliSIEM system.
+ * Source plugins define external data sources and their configurations.
  *
  * <p>This class is mapped to the 'source_plugin' table in the database.</p>
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "source_plugin")
-@ToString(onlyExplicitlyIncluded = true)
 public class SourcePlugin {
 
     /**
@@ -46,7 +38,6 @@ public class SourcePlugin {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Integer id;
 
     /**
@@ -54,7 +45,6 @@ public class SourcePlugin {
      */
     @Column(nullable = false, name = "plugin_name", length = 100)
     @NotBlank(message = "Plugin name cannot be blank.")
-    @ToString.Include
     private String pluginName;
 
     /**
@@ -62,7 +52,6 @@ public class SourcePlugin {
      * Defaults to true.
      */
     @Column(nullable = false, name = "enabled")
-    @ToString.Include
     private Boolean enabled = true;
 
     /**
@@ -79,10 +68,82 @@ public class SourcePlugin {
     private LocalDateTime createdAt;
 
     /**
+     * Default constructor.
+     */
+    public SourcePlugin() {}
+
+    public SourcePlugin(String pluginName, Boolean enabled, String description) {
+        this.pluginName = pluginName;
+        this.enabled = enabled;
+        this.description = description;
+    }
+
+    // Getters and setters
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getPluginName() {
+        return pluginName;
+    }
+
+    public void setPluginName(String pluginName) {
+        this.pluginName = pluginName;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * Lifecycle hook to set the creation timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SourcePlugin that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "SourcePlugin{" +
+                "id=" + id +
+                ", pluginName='" + pluginName + '\'' +
+                ", enabled=" + enabled +
+                ", description='" + description + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

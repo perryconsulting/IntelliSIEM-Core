@@ -18,13 +18,9 @@ package com.intellisiem.core.domain.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents the source of an asset in the IntelliSIEM system.
@@ -33,13 +29,9 @@ import java.time.LocalDateTime;
  * <p>This class is mapped to the 'asset_source' table in the database, and its fields
  * represent columns in the table.</p>
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Entity
 @Table(schema = "intellisiem", name = "asset_source")
-@ToString(onlyExplicitlyIncluded = true)
 public class AssetSource {
 
     /**
@@ -48,7 +40,6 @@ public class AssetSource {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Integer id;
 
     /**
@@ -56,7 +47,6 @@ public class AssetSource {
      */
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Source name cannot be blank.")
-    @ToString.Include
     private String name;
 
     /**
@@ -73,10 +63,79 @@ public class AssetSource {
     private LocalDateTime createdAt;
 
     /**
+     * Default constructor
+     */
+    public AssetSource() {
+    }
+
+    /**
+     * Constructor with parameters
+     *
+     * @param name the name of the asset source.
+     * @param description the description of the asset source
+     */
+    public AssetSource(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    // Getters and setters
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * Lifecycle hook to set the creation timestamp before the entity is persisted.
      */
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AssetSource that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "AssetSource{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

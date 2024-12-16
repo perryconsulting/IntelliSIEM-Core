@@ -20,27 +20,17 @@ import com.intellisiem.core.domain.enums.Criticality;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-import java.time.LocalDateTime;
 
 /**
  * Represents an asset in the IntelliSIEM system.
  * Each asset corresponds to a physical or virtual device within the monitored environment.
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "intellisiem", name = "asset")
-@ToString(onlyExplicitlyIncluded = true) // Avoid the inclusion of lazy-loaded relationships
 public class Asset {
 
     /**
@@ -48,7 +38,6 @@ public class Asset {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @ToString.Include
     private UUID id;
 
     /**
@@ -56,7 +45,6 @@ public class Asset {
      */
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Hostname cannot be blank.")
-    @ToString.Include
     private String hostname;
 
     /**
@@ -103,7 +91,6 @@ public class Asset {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
-    @ToString.Exclude // Prevents lazy loading during toString()
     private AssetSource source;
 
     /**
@@ -117,6 +104,112 @@ public class Asset {
      */
     @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
+
+    /**
+     * Default constructor
+     */
+    public Asset() {}
+
+    /**
+     * Constructor with parameters.
+     *
+     * @param hostname the hostname of the asset.
+     * @param fqdn the fully qualified domain name of the asset.
+     * @param macAddress the MAC address of the asset.
+     * @param assetType the type of the asset (e.g., Server).
+     * @param osName the name of the operating system.
+     * @param osVersion the version of the operating system.
+     * @param criticality the criticality level of the asset.
+     * @param source the source of the asset information.
+     */
+    public Asset(String hostname, String fqdn, String macAddress, String assetType, String osName, String osVersion, Criticality criticality, AssetSource source) {
+        this.hostname = hostname;
+        this.fqdn = fqdn;
+        this.macAddress = macAddress;
+        this.assetType = assetType;
+        this.osName = osName;
+        this.osVersion = osVersion;
+        this.criticality = criticality;
+        this.source = source;
+    }
+
+    // Getters and setters
+    public UUID getId() {
+        return id;
+    }
+    public void setId(UUID id) {
+        this.id = id;
+    }
+    public String getHostname() {
+        return hostname;
+    }
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public String getFqdn() {
+        return fqdn;
+    }
+
+    public void setFqdn(String fqdn) {
+        this.fqdn = fqdn;
+    }
+
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getOsName() {
+        return osName;
+    }
+
+    public void setOsName(String osName) {
+        this.osName = osName;
+    }
+
+    public String getOsVersion() {
+        return osVersion;
+    }
+
+    public void setOsVersion(String osVersion) {
+        this.osVersion = osVersion;
+    }
+
+    public Criticality getCriticality() {
+        return criticality;
+    }
+
+    public void setCriticality(Criticality criticality) {
+        this.criticality = criticality;
+    }
+
+    public AssetSource getSource() {
+        return source;
+    }
+
+    public void setSource(AssetSource source) {
+        this.source = source;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
     /**
      * Lifecycle hook to set the creation and update timestamps before the entity is persisted.
@@ -146,7 +239,7 @@ public class Asset {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Asset asset)) return false;
-        return id != null && id.equals(asset.id);
+        return Objects.equals(id, asset.id);
     }
 
     /**
@@ -158,5 +251,19 @@ public class Asset {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Asset{" +
+                "id=" + id +
+                ", hostname='" + hostname + '\'' +
+                ", fqdn='" + fqdn + '\'' +
+                ", macAddress='" + macAddress + '\'' +
+                ", assetType='" + assetType + '\'' +
+                ", osName='" + osName + '\'' +
+                ", osVersion='" + osVersion + '\'' +
+                ", criticality=" + criticality +
+                '}';
     }
 }

@@ -17,7 +17,6 @@
 package com.intellisiem.core.application.services;
 
 import com.intellisiem.core.adapters.outbound.repositories.AssetRepository;
-import com.intellisiem.core.domain.enums.Criticality;
 import com.intellisiem.core.domain.models.Asset;
 import org.springframework.stereotype.Service;
 

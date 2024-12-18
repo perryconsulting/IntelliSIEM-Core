@@ -39,7 +39,7 @@ public interface AffectedProductRepository extends CrudRepository<AffectedProduc
      * @param vulnerabilityId the unique identifier of the associated vulnerability.
      * @return a list of affected products linked to the specified vulnerability.
      */
-    @Query("SELECT * FROM intellisiem.affected_product WHERE vulnerability_id = :vulnerabilityId")
+    @Query("SELECT * FROM affected_product WHERE vulnerability_id = :vulnerabilityId")
     List<AffectedProduct> findByVulnerabilityId(Integer vulnerabilityId);
 
     /**
@@ -51,7 +51,7 @@ public interface AffectedProductRepository extends CrudRepository<AffectedProduc
      * @return true if an affected product with the given parameters exists, false otherwise.
      */
     @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END " +
-            "FROM intellisiem.affected_product WHERE vulnerability_id = :vulnerabilityId " +
+            "FROM affected_product WHERE vulnerability_id = :vulnerabilityId " +
             "AND product_name = :productName")
     boolean existsByVulnerabilityIdAndProductName(Integer vulnerabilityId, String productName);
 
@@ -61,6 +61,6 @@ public interface AffectedProductRepository extends CrudRepository<AffectedProduc
      * @param vulnerabilityId the unique identifier of the associated vulnerability.
      */
     @Modifying
-    @Query("DELETE FROM intellisiem.affected_product WHERE vulnerability_id = :vulnerabilityId")
+    @Query("DELETE FROM affected_product WHERE vulnerability_id = :vulnerabilityId")
     void deleteByVulnerabilityId(Integer vulnerabilityId);
 }

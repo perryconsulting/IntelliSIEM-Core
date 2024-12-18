@@ -38,7 +38,7 @@ public interface ThreatIntelligenceRepository extends CrudRepository<ThreatIntel
      * @param severity the severity level (e.g., "critical", "high", "medium", "low").
      * @return a list of threat intelligence records matching the specified severity.
      */
-    @Query("SELECT * FROM intellisiem.threat_intelligence WHERE severity = :severity")
+    @Query("SELECT * FROM threat_intelligence WHERE severity = :severity")
     List<ThreatIntelligence> findBySeverity(String severity);
 
     /**
@@ -47,7 +47,7 @@ public interface ThreatIntelligenceRepository extends CrudRepository<ThreatIntel
      * @param threatType the type of threat (e.g., "Malware", "CVE", "IP", "Domain").
      * @return a list of threat intelligence records matching the specified type.
      */
-    @Query("SELECT * FROM intellisiem.threat_intelligence WHERE threat_type = :threatType")
+    @Query("SELECT * FROM threat_intelligence WHERE threat_type = :threatType")
     List<ThreatIntelligence> findByThreatType(String threatType);
 
     /**
@@ -56,6 +56,6 @@ public interface ThreatIntelligenceRepository extends CrudRepository<ThreatIntel
      * @param value the search pattern (e.g., partial match for threat values).
      * @return a list of threat intelligence records whose values match the pattern.
      */
-    @Query("SELECT * FROM intellisiem.threat_intelligence WHERE value LIKE %:value%")
+    @Query("SELECT * FROM threat_intelligence WHERE value LIKE %:value%")
     List<ThreatIntelligence> searchByValue(String value);
 }

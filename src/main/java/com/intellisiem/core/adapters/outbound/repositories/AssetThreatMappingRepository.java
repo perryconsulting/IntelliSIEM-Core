@@ -39,7 +39,7 @@ public interface AssetThreatMappingRepository extends CrudRepository<AssetThreat
      * @param assetId the unique identifier of the associated asset.
      * @return a list of asset-threat mappings linked to the specified asset.
      */
-    @Query("SELECT * FROM intellisiem.asset_threat_mapping WHERE asset_id = :assetId")
+    @Query("SELECT * FROM asset_threat_mapping WHERE asset_id = :assetId")
     List<AssetThreatMapping> findByAssetId(UUID assetId);
 
     /**
@@ -48,7 +48,7 @@ public interface AssetThreatMappingRepository extends CrudRepository<AssetThreat
      * @param threatId the unique identifier of the associated threat.
      * @return a list of asset-threat mappings linked to the specified threat.
      */
-    @Query("SELECT * FROM intellisiem.asset_threat_mapping WHERE threat_id = :threatId")
+    @Query("SELECT * FROM asset_threat_mapping WHERE threat_id = :threatId")
     List<AssetThreatMapping> findByThreatId(Integer threatId);
 
     /**
@@ -57,6 +57,6 @@ public interface AssetThreatMappingRepository extends CrudRepository<AssetThreat
      * @param threshold the relevance score threshold.
      * @return a list of asset-threat mappings with relevance scores exceeding the threshold.
      */
-    @Query("SELECT * FROM intellisiem.asset_threat_mapping WHERE relevance_score > :threshold")
+    @Query("SELECT * FROM asset_threat_mapping WHERE relevance_score > :threshold")
     List<AssetThreatMapping> findByRelevanceScoreGreaterThan(Double threshold);
 }

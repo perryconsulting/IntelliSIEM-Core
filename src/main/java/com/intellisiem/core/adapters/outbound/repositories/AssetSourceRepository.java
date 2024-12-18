@@ -38,6 +38,6 @@ public interface AssetSourceRepository extends CrudRepository<AssetSource, Integ
      * @param name the name of the asset source to retrieve.
      * @return an {@link Optional} containing the matching asset source, if found.
      */
-    @Query("SELECT * FROM intellisiem.asset_source WHERE name = :name")
+    @Query("SELECT * FROM asset_source WHERE name = :name")
     Optional<AssetSource> findByName(String name);
 }

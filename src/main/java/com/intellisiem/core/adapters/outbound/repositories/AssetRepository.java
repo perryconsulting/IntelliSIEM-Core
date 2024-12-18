@@ -41,7 +41,7 @@ public interface AssetRepository extends CrudRepository<Asset, UUID> {
      * @param hostname the hostname of the asset to retrieve.
      * @return an {@link Optional} containing the matching asset, if found.
      */
-    @Query("SELECT * FROM intellisiem.asset WHERE hostname = :hostname")
+    @Query("SELECT * FROM asset WHERE hostname = :hostname")
     Optional<Asset> findByHostname(String hostname);
 
     /**
@@ -50,7 +50,7 @@ public interface AssetRepository extends CrudRepository<Asset, UUID> {
      * @param assetType the type of the asset (e.g., "Server", "Workstation").
      * @return a list of assets matching the given type.
      */
-    @Query("SELECT * FROM intellisiem.asset WHERE asset_type = :assetType")
+    @Query("SELECT * FROM asset WHERE asset_type = :assetType")
     List<Asset> findByAssetType(String assetType);
 
     /**
@@ -59,7 +59,7 @@ public interface AssetRepository extends CrudRepository<Asset, UUID> {
      * @param criticality the criticality level (e.g., HIGH, MEDIUM, LOW).
      * @return a list of assets matching the specified criticality.
      */
-    @Query("SELECT * FROM intellisiem.asset WHERE criticality = :criticality")
+    @Query("SELECT * FROM asset WHERE criticality = :criticality")
     List<Asset> findByCriticality(Criticality criticality);
 
     /**
@@ -68,6 +68,6 @@ public interface AssetRepository extends CrudRepository<Asset, UUID> {
      * @param hostname the hostname to check.
      * @return true if an asset with the given hostname exists, false otherwise.
      */
-    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM intellisiem.asset WHERE hostname = :hostname")
+    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM asset WHERE hostname = :hostname")
     boolean existsByHostname(String hostname);
 }

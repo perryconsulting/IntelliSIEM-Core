@@ -38,7 +38,7 @@ public interface SourcePluginRepository extends CrudRepository<SourcePlugin, Int
      *
      * @return a list of source plugins where the "enabled" flag is true.
      */
-    @Query("SELECT * FROM intellisiem.source_plugin WHERE enabled = TRUE")
+    @Query("SELECT * FROM source_plugin WHERE enabled = TRUE")
     List<SourcePlugin> findByEnabledTrue();
 
     /**
@@ -47,6 +47,6 @@ public interface SourcePluginRepository extends CrudRepository<SourcePlugin, Int
      * @param pluginName the name of the plugin to search for.
      * @return an {@link Optional} containing the matching source plugin, if found.
      */
-    @Query("SELECT * FROM intellisiem.source_plugin WHERE plugin_name = :pluginName")
+    @Query("SELECT * FROM source_plugin WHERE plugin_name = :pluginName")
     Optional<SourcePlugin> findByPluginName(String pluginName);
 }

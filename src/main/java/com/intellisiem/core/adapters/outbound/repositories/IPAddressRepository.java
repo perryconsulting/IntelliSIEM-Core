@@ -40,7 +40,7 @@ public interface IPAddressRepository extends CrudRepository<IPAddress, Integer> 
      * @param assetId the unique identifier of the associated asset.
      * @return a list of IP addresses linked to the specified asset.
      */
-    @Query("SELECT * FROM intellisiem.ip_address WHERE asset_id = :assetId")
+    @Query("SELECT * FROM ip_address WHERE asset_id = :assetId")
     List<IPAddress> findByAssetId(UUID assetId);
 
     /**
@@ -49,6 +49,6 @@ public interface IPAddressRepository extends CrudRepository<IPAddress, Integer> 
      * @param ip the IP address to retrieve.
      * @return an {@link Optional} containing the matching IP address, if found.
      */
-    @Query("SELECT * FROM intellisiem.ip_address WHERE ip_address = :ip")
+    @Query("SELECT * FROM ip_address WHERE ip_address = :ip")
     Optional<IPAddress> findByIp(String ip);
 }

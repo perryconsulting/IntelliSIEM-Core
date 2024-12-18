@@ -31,7 +31,7 @@ import java.util.Objects;
  * includes a calculated relevance score for prioritization.</p>
  */
 @Entity
-@Table(schema = "intellisiem", name = "asset_threat_mapping")
+@Table(name = "asset_threat_mapping")
 public class AssetThreatMapping {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AssetThreatMapping.class);

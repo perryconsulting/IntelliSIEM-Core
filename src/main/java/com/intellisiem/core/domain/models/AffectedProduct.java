@@ -31,7 +31,7 @@ import java.util.Objects;
  * <p>This entity is mapped to the 'affected_product' table in the database.</p>
  */
 @Entity
-@Table(schema = "intellisiem", name = "affected_product")
+@Table(name = "affected_product")
 public class AffectedProduct {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AffectedProduct.class);

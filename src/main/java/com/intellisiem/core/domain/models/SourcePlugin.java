@@ -31,7 +31,7 @@ import java.util.Objects;
  * <p>This class is mapped to the 'source_plugin' table in the database.</p>
  */
 @Entity
-@Table(schema = "intellisiem", name = "source_plugin")
+@Table(name = "source_plugin")
 public class SourcePlugin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourcePlugin.class);

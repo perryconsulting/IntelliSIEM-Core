@@ -41,7 +41,7 @@ public abstract class AbstractTestBase {
     private Flyway flyway;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public JdbcTemplate jdbcTemplate;
 
     private static final Set<String> ALLOWED_TABLES = Set.of(
             "asset",
@@ -82,14 +82,19 @@ public abstract class AbstractTestBase {
     protected void truncateTables(String... tableNames) {
         for (String table : tableNames) {
             if (isTableNameValid(table)) {
-                String sql = "TRUNCATE TABLE " + table + " CASCADE";
-                jdbcTemplate.execute(sql);
-                System.out.println("Truncated table: " + table);
+                String sql = String.format("TRUNCATE TABLE %s CASCADE", table);
+                try {
+                    jdbcTemplate.execute(sql);
+                    System.out.println("Truncated table: " + table);
+                } catch (Exception e) {
+                    System.err.println("Failed to truncate table: " + table + ". Error: " + e.getMessage());
+                }
             } else {
                 System.err.println("Invalid table name skipped: " + table);
             }
         }
     }
+
 
     /**
      * Counts the number of rows in a specific table.
@@ -117,7 +122,7 @@ public abstract class AbstractTestBase {
      * @param tableName the name of the table to validate.
      * @return true if the table name is valid; false otherwise.
      */
-    private boolean isTableNameValid(String tableName) {
+    protected boolean isTableNameValid(String tableName) {
         return ALLOWED_TABLES.contains(tableName);
     }
 }

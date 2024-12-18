@@ -34,7 +34,7 @@ import java.util.UUID;
  * <p>This entity is mapped to the 'asset' table in the database.</p>
  */
 @Entity
-@Table(schema = "intellisiem", name = "asset")
+@Table(name = "asset")
 public class Asset {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);

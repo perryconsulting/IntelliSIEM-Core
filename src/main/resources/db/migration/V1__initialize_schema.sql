@@ -30,6 +30,22 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright (c) 2024 Rob Perry
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 -- Table: asset_source
 CREATE TABLE asset_source
 (
@@ -50,9 +66,9 @@ CREATE TABLE asset
     os_name     VARCHAR(100),
     os_version  VARCHAR(50),
     criticality VARCHAR(10) CHECK (criticality IN ('high', 'medium', 'low')),
-    source_id   INT          REFERENCES asset_source (id) ON DELETE SET NULL,
-    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+    source_id   INT REFERENCES asset_source (id) ON DELETE SET NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: ip_address (normalized from asset.ip_addresses)
@@ -69,7 +85,7 @@ CREATE TABLE threat_intelligence
 (
     id          SERIAL PRIMARY KEY,
     threat_type VARCHAR(50) NOT NULL, -- e.g., "Malware", "CVE", "IP", "Domain"
-    value       TEXT        NOT NULL,
+    value       TEXT NOT NULL,
     description TEXT,
     severity    VARCHAR(10) CHECK (severity IN ('critical', 'high', 'medium', 'low')),
     first_seen  TIMESTAMP,
@@ -84,7 +100,7 @@ CREATE TABLE vulnerability
     cve_id            VARCHAR(20) UNIQUE,
     description       TEXT,
     severity          VARCHAR(10) CHECK (severity IN ('critical', 'high', 'medium', 'low')),
-    exploit_available BOOLEAN   DEFAULT FALSE,
+    exploit_available BOOLEAN DEFAULT FALSE,
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -104,7 +120,7 @@ CREATE TABLE asset_threat_mapping
     asset_id        UUID REFERENCES asset (id) ON DELETE CASCADE,
     threat_id       INT REFERENCES threat_intelligence (id) ON DELETE CASCADE,
     relevance_score DECIMAL(5, 2) NOT NULL DEFAULT 0.0, -- Calculated score for prioritization
-    created_at      TIMESTAMP              DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: source_plugin
@@ -112,7 +128,7 @@ CREATE TABLE source_plugin
 (
     id          SERIAL PRIMARY KEY,
     plugin_name VARCHAR(100) NOT NULL,
-    enabled     BOOLEAN   DEFAULT TRUE,
+    enabled     BOOLEAN DEFAULT TRUE,
     description TEXT,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

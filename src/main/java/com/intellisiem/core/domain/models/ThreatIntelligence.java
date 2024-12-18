@@ -31,7 +31,7 @@ import java.util.Objects;
  * <p>This entity is mapped to the 'threat_intelligence' table in the database.</p>
  */
 @Entity
-@Table(schema = "intellisiem", name = "threat_intelligence")
+@Table(name = "threat_intelligence")
 public class ThreatIntelligence {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreatIntelligence.class);

@@ -31,7 +31,7 @@ import java.util.Objects;
  * <p>This entity is mapped to the 'ip_address' table in the database.</p>
  */
 @Entity
-@Table(schema = "intellisiem", name = "ip_address")
+@Table(name = "ip_address")
 public class IPAddress {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IPAddress.class);

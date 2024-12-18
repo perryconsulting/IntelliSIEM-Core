@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 
 @Entity
-@Table(schema = "intellisiem", name = "asset_source")
+@Table(name = "asset_source")
 public class AssetSource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetSource.class);

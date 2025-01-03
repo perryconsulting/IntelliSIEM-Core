@@ -1,0 +1,54 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Java source files
+*.java text diff=java
+*.groovy text diff=java
+
+# XML files
+*.xml text diff=xml
+pom.xml text diff=xml
+
+# Properties files
+*.properties text
+application*.yml text
+application*.yaml text
+.env text
+
+# Shell scripts should use LF
+*.sh text eol=lf
+mvnw text eol=lf
+*.cmd text eol=crlf
+
+# SQL files
+*.sql text eol=lf
+
+# Docker files
+Dockerfile text
+docker-compose*.yml text
+*.dockerfile text
+
+# Documentation
+*.md text diff=markdown
+LICENSE text
+*.txt text
+
+# Configuration files
+.gitattributes text
+.gitignore text
+.editorconfig text
+
+# Binary files
+*.jar binary
+*.war binary
+*.zip binary
+*.tar binary
+*.tar.gz binary
+*.ear binary
+*.pdf binary
+*.db binary
+
+# IDE files
+*.iml text
+.idea/workspace.xml text
+.idea/tasks.xml text

@@ -143,6 +143,7 @@
 
     <build>
         <plugins>
+
             <!-- Enforcer Plugin: Validates build environment -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -168,6 +169,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Compiler Plugin: Java compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -181,6 +183,7 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+
             <!-- Surefire Plugin: Unit tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -191,6 +194,7 @@
                     </includes>
                 </configuration>
             </plugin>
+
             <!-- Failsafe Plugin: Integration tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -210,6 +214,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- JaCoCo Plugin: Test coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -259,6 +264,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Source Plugin: Source JAR generation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -272,6 +278,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Javadoc Plugin: Documentation generation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -290,6 +297,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Spring Boot Plugin: Application packaging -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
